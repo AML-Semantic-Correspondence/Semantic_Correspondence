@@ -1,16 +1,17 @@
 # @title Main
 
-# !pip install torchmetrics                # ONLY FOR FIRST EXECUTION
+# %pip install torchmetrics                # ONLY FOR FIRST EXECUTION
 
 from google.colab import drive
 from Inference import run_evaluation
+from Train import Train_step
 from Configurations import CONFIGURATION, Loader
 import torch, time
 
 # --- IF SAM MODEL ---
 
 if CONFIGURATION["MODEL_VERSION"] == "sam":
-    # !pip install git+https://github.com/facebookresearch/segment-anything.git
+    # %pip install git+https://github.com/facebookresearch/segment-anything.git
     from segment_anything import sam_model_registry                 # DOWNLOAD
 
 # --- MOUNT DRIVE AND EXTRACT DATASET ---
@@ -31,6 +32,13 @@ elif CONFIGURATION["MODEL_VERSION"] == "sam":
     MODEL = sam_model_registry["vit_b"](checkpoint=CONFIGURATION["PTH_PATH"])
 MODEL = MODEL.to(CONFIGURATION["DEVICE"])
 
+# FINE TUNING PHASE
+
+if CONFIGURATION["TUNING"]:
+    Train_step()
+
+# INFERENCE PHASE 
+
 if CONFIGURATION["DEVICE"] == "cuda":
     torch.cuda.synchronize()                         # SYNCHROIZE GPU
 
@@ -41,7 +49,7 @@ if CONFIGURATION["DEVICE"] == "cuda":
 else:
     start_event = time.time()       # GO
 
-loader = Loader(0, batch_size=1)
+loader = Loader(index=0)
 run_evaluation(loader, "test")
 
 if CONFIGURATION["DEVICE"] == "cuda":

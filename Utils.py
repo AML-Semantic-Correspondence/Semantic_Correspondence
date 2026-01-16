@@ -37,7 +37,8 @@ def get_descriptors(img_path, grad):
     return (x, w, h)
 
 # --- GET PREDICTIONS ---
-# --- FOR EACH SRC_KPS RESCALE IT, USE COSINE SIMILARITY METRIC AND COMPUTE THE PREDICTION WITH SIMPLE ARGMAX  ---
+# --- EXTRACT DESCRIPTORS, FOR EACH SRC_KPS RESCALE IT ---
+# --- USE COSINE SIMILARITY METRIC AND COMPUTE THE PREDICTION WITH SIMPLE ARGMAX  ---
 
 def get_predictions(batch, index=0):
     src_kps = batch["src_kps"][index]

@@ -5,13 +5,13 @@ from Configurations import CONFIGURATION
 import os, json, numpy as np
 
 # --- DATASET CLASSES ---
-# --- COLLECT ALL JSON FILE BASED ---
+# --- COLLECT ALL JSON FILE ---
 # --- WHEN REQUIRED, OPEN THE NEXT FILE AND TAKE IN A DICTIONARY ALL YOU NEED ---
 
 class SPair71kDataset(Dataset):
-    def __init__(self, pair_path, source_path, folder_path):
+
+    def __init__(self, pair_path, source_path):
         self.image_path = source_path
-        self.folder_path = folder_path
         file = open(pair_path, "r")
         self.pair_files = file.readlines()                # TAKE ALL JSON FILES
         file.close()
@@ -29,8 +29,8 @@ class SPair71kDataset(Dataset):
         annotation = json.load(file)             # LOAD INFORMATIONS
         file.close()
 
-        src_path = os.path.join(self.folder_path, category, annotation["src_imname"])
-        trg_path = os.path.join(self.folder_path, category, annotation["trg_imname"])
+        src_path = os.path.join(CONFIGURATION["IMAGE_FOLDER_NAME_SPAIR71K"], category, annotation["src_imname"])
+        trg_path = os.path.join(CONFIGURATION["IMAGE_FOLDER_NAME_SPAIR71K"], category, annotation["trg_imname"])
         ids = [int(el) for el in annotation["kps_ids"]]
 
         return {
@@ -51,14 +51,17 @@ def custom_collate_fn(batch):
 
 # --- GENERATE DATALOADER FROM REQUIRED OPERATION --
 
-def Loader(index, batch_size):
-    if index == 0:                                         # FOR INFERENCE WITH SPAIR
-        dataset=SPair71kDataset(CONFIGURATION["ALL_TEST_PATH_SPAIR71K"], CONFIGURATION["PATH_TEST_SPAIR71K"],
-                                CONFIGURATION["IMAGE_FOLDER_NAME_SPAIR71K"])
+def Loader(index):            # TEST, TRAINING OR EVALUATION
+    if index == 0:
+        dataset = SPair71kDataset(CONFIGURATION["ALL_TEST_PATH_SPAIR71K"], CONFIGURATION["PATH_TEST_SPAIR71K"])
+        loader = DataLoader(dataset, 1)
 
-    if batch_size>1:
-        loader=DataLoader(dataset, batch_size=batch_size, collate_fn=custom_collate_fn)
-    else:
-        loader=DataLoader(dataset, batch_size=1)
+    elif index == 1:
+        dataset = SPair71kDataset(CONFIGURATION["ALL_TRAIN_PATH_SPAIR71K"], CONFIGURATION["PATH_TRAIN_SPAIR71K"])
+        loader = DataLoader(dataset, CONFIGURATION["BATCH_SIZE"], collate_fn=custom_collate_fn)
+
+    elif index == 2:
+        dataset = SPair71kDataset(CONFIGURATION["ALL_VAL_PATH_SPAIR71K"], CONFIGURATION["PATH_VAL_SPAIR71K"])
+        loader = DataLoader(dataset, 1)
 
     return loader

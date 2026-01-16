@@ -29,7 +29,7 @@ def run_evaluation(loader, split_desc, visualize=False):
         total_points_image = 0                                      # FOR THE CURRENT IMAGE
         total_images += 1
 
-        for i in range(0, len(batch["kps_ids"][0])):
+        for i in range(len(batch["kps_ids"][0])):
             total_keypoints += 1
 
             dist = torch.norm(pred_kps[i] - trg_kps[i]).item()            # DISTANCE METRIC
