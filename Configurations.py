@@ -7,12 +7,12 @@ import torch
 
 CONFIGURATION = {
 	"PATH_DRIVE": "/content/drive",
-	"PATH_EXPORT": "/content/drive/MyDrive/AML-Semantic-Correspondence/weights/",
 	"PATH_FILE": "/content/drive/MyDrive/AML-Semantic-Correspondence/datasets/SPair-71k.tar.gz",
+  "PATH_BEST_MODEL": "/content/drive/MyDrive/AML-Semantic-Correspondence/weights/best_model.pth",
 
-	"PTH_PATH": "/content/drive/MyDrive/AML-Semantic-Correspondence/weights/dinov2_vitb14_reg4_pretrain.pth",
-  # "PTH_PATH": "/content/drive/MyDrive/AML-Semantic-Correspondence/weights/dinov3_vitb16_pretrain_lvd1689m-73cec8be.pth",
-  # "PTH_PATH": "/content/drive/MyDrive/AML-Semantic-Correspondence/weights/sam_vit_b_01ec64.pth",
+	"PTH_PATH_DINOV2": "/content/drive/MyDrive/AML-Semantic-Correspondence/weights/dinov2_vitb14_reg4_pretrain.pth",
+  "PTH_PATH_DINOV3": "/content/drive/MyDrive/AML-Semantic-Correspondence/weights/dinov3_vitb16_pretrain_lvd1689m-73cec8be.pth",
+  "PTH_PATH_SAM": "/content/drive/MyDrive/AML-Semantic-Correspondence/weights/sam_vit_b_01ec64.pth",
 
   "DEVICE": "cuda" if torch.cuda.is_available() else "cpu",
   "MODEL_VERSION": "dinov2",                                        # "dinov2", "dinov3", "sam"
@@ -31,7 +31,6 @@ CONFIGURATION = {
 
   # FOR INFERENCE
 
-  "IMAGE_SIZE": 518,           # 518 for dinov2, 512 for dinov3 and 1024 for sam (TO ASK IF IT'S CORRECT)
 	"ALPHA": [0.05, 0.1, 0.2],
 
   # FOR TUNING
@@ -47,10 +46,17 @@ CONFIGURATION = {
 
 MODEL = None
 
+if CONFIGURATION["MODEL_VERSION"] == "dinov2":              # DINOV2 -> DIM PATCH -> 14 -> IMAGE SIZE 518
+  IMAGE_SIZE = 518
+elif CONFIGURATION["MODEL_VERSION"] == "dinov3":            # DINOV3 -> DIM PATCH -> 16 -> IMAGE SIZE 512
+  IMAGE_SIZE = 512
+else:
+  IMAGE_SIZE = 1024                                         # SAM -> DIM PATCH -> 16 -> IMAGE SIZE 1024
+
 # --- RESIZE IMAGE TO STANDARD MODEL DIMENSIONS, CONVERT IT INTO A TENSOR AND NORMALIZE IT ---
 
 PREPROCESS = transforms.Compose([
-    transforms.Resize((CONFIGURATION["IMAGE_SIZE"], CONFIGURATION["IMAGE_SIZE"])),
+    transforms.Resize((IMAGE_SIZE, IMAGE_SIZE)),
     transforms.ToTensor(),
     transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
 ])

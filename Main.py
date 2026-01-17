@@ -11,7 +11,7 @@ import torch, time
 # --- IF SAM MODEL ---
 
 if CONFIGURATION["MODEL_VERSION"] == "sam":
-    # %pip install git+https://github.com/facebookresearch/segment-anything.git
+#     %pip install git+https://github.com/facebookresearch/segment-anything.git
     from segment_anything import sam_model_registry                 # DOWNLOAD
 
 # --- MOUNT DRIVE AND EXTRACT DATASET ---
@@ -25,19 +25,21 @@ print()
 print("Loading ", CONFIGURATION["MODEL_VERSION"], " model...")
 
 if CONFIGURATION["MODEL_VERSION"] == "dinov2":
-    MODEL = torch.hub.load("facebookresearch/dinov2", "dinov2_vitb14_reg", weights=CONFIGURATION["PTH_PATH"])
+    MODEL = torch.hub.load("facebookresearch/dinov2", "dinov2_vitb14_reg", weights=CONFIGURATION["PTH_PATH_DINOV2"])
 elif CONFIGURATION["MODEL_VERSION"] == "dinov3":
-    MODEL = torch.hub.load("facebookresearch/dinov3", "dinov3_vitb16", weights=CONFIGURATION["PTH_PATH"])
+    MODEL = torch.hub.load("facebookresearch/dinov3", "dinov3_vitb16", weights=CONFIGURATION["PTH_PATH_DINOV3"])
 elif CONFIGURATION["MODEL_VERSION"] == "sam":
-    MODEL = sam_model_registry["vit_b"](checkpoint=CONFIGURATION["PTH_PATH"])
+    MODEL = sam_model_registry["vit_b"](checkpoint=CONFIGURATION["PTH_PATH_SAM"])
 MODEL = MODEL.to(CONFIGURATION["DEVICE"])
 
 # FINE TUNING PHASE
 
 if CONFIGURATION["TUNING"]:
     Train_step()
+    print("LOADING BEST MODEL FOUND FOR " + CONFIGURATION["MODEL_VERSION"])
+    MODEL.load_state_dict(torch.load(CONFIGURATION["PATH_BEST_MODEL"]))            # BEST MODEL CHOSEN
 
-# INFERENCE PHASE 
+# INFERENCE PHASE
 
 if CONFIGURATION["DEVICE"] == "cuda":
     torch.cuda.synchronize()                         # SYNCHROIZE GPU
@@ -49,6 +51,7 @@ if CONFIGURATION["DEVICE"] == "cuda":
 else:
     start_event = time.time()       # GO
 
+MODEL.eval()
 loader = Loader(index=0)
 run_evaluation(loader, "test")
 
@@ -62,4 +65,3 @@ else:
 elapsed_time = start_event.elapsed_time(end_event) / 1000              # SECONDS
 print()
 print("Analysis for: " + CONFIGURATION["DEVICE"])
-print("Total required time: " + str(elapsed_time) + " seconds")

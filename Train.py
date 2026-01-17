@@ -88,6 +88,7 @@ def get_split_loss(batch, grad=True, index=0):
 # --- FINALLY SHOW THE VALUES ---
 
 def Train_step():
+    global_loss = float("inf")
     loader_train = Loader(index=1)
     loader_val = Loader(index=2)
 
@@ -134,13 +135,19 @@ def Train_step():
 
         # --- VALIDATION PHASE ---
 
-        val_loss = get_split_loss(loader_val)
+        val_loss = get_total_loss(loader_val)
 
         print("="*60)
         print("Epoch train loss: " + str(epoch_train_loss))
         print("Epoch validation loss: " + str(val_loss))                  # NUMBERS
         print()
         run_evaluation(loader_val, "validation")
+
+        if val_loss < global_loss:
+            global_loss = val_loss
+            torch.save(MODEL.state_dict(), CONFIGURATION["PATH_BEST_MODEL"])
+            print("BEST MODEL SAVED!")
+
         print("="*60)
         print()
 

@@ -1,9 +1,10 @@
 # @title Inference
 
 from Configurations import CONFIGURATION
-from Utils import get_predictions, visualize_keypoints
+from Utils import get_predictions
 from tqdm.auto import tqdm
-import torch
+from matplotlib import pyplot as plt
+import torch, cv2
 
 # --- EVALUATION FUNCTION ---
 # --- FOR EACH PAIR: LOAD SOURCE AND TARGET IMAGES ---
@@ -49,7 +50,8 @@ def run_evaluation(loader, split_desc, visualize=False):
             total_correct[alpha] += total_correct_image[alpha]
 
         if visualize:
-            visualize_keypoints(batch["src_path"][0], batch["trg_path"][0], batch["src_kps"][0], pred_kps,trg_kps)
+            visualize_keypoints(batch["src_path"][0], batch["trg_path"][0], batch["src_kps"][0],
+                                pred_kps.cpu().numpy(),trg_kps.cpu().numpy())
 
     print("PCK@t results per image:")
     for alpha in CONFIGURATION["ALPHA"]:
@@ -63,3 +65,22 @@ def run_evaluation(loader, split_desc, visualize=False):
         print("PCK@" + str(alpha) + ": " + str(total_correct_keypoints[alpha]) + "%")
 
     return
+
+# --- VISUALIZE RESULTS AND COMPARE CORRECT AND PREDICTED KEYPOINTS ON TARGET IMAGE. ---
+
+def visualize_keypoints(src_path, trg_path, src_kps, pred_kps, trg_kps):
+    src_img = cv2.imread(src_path)[:, :, ::-1]
+    trg_img = cv2.imread(trg_path)[:, :, ::-1]
+
+    (_, axes) = plt.subplots(1, 2, figsize=(12, 6))
+    axes[0].imshow(src_img)
+    axes[0].scatter(src_kps[:,0], src_kps[:,1], c="r", s=40, label="src_kps")
+    axes[0].set_title("Source Image")
+
+    axes[1].imshow(trg_img)
+    axes[1].scatter(pred_kps[:,0], pred_kps[:,1], c="b", s=40, label="pred_kps")
+    axes[1].scatter(trg_kps[:,0], trg_kps[:,1], c="g", s=40, marker="X", label="gt_kps")
+    axes[1].set_title("Target Image")
+
+    plt.legend()
+    plt.show()
