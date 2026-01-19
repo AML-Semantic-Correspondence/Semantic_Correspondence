@@ -84,3 +84,4 @@ def visualize_keypoints(src_path, trg_path, src_kps, pred_kps, trg_kps):
 
     plt.legend()
     plt.show()
+    return

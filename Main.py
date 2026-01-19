@@ -11,7 +11,7 @@ import torch, time
 # --- IF SAM MODEL ---
 
 if CONFIGURATION["MODEL_VERSION"] == "sam":
-#     %pip install git+https://github.com/facebookresearch/segment-anything.git
+    # %pip install git+https://github.com/facebookresearch/segment-anything.git
     from segment_anything import sam_model_registry                 # DOWNLOAD
 
 # --- MOUNT DRIVE AND EXTRACT DATASET ---
@@ -65,3 +65,4 @@ else:
 elapsed_time = start_event.elapsed_time(end_event) / 1000              # SECONDS
 print()
 print("Analysis for: " + CONFIGURATION["DEVICE"])
+print("Total required time: " + str(elapsed_time) + " seconds")

@@ -55,13 +55,41 @@ def get_predictions(batch, index=0):
         sy = torch.clamp(torch.tensor(sy, device=CONFIGURATION["DEVICE"]), 0, Hf - 1)
 
         src_desc = feat_src[0, sy, sx, :]
-        sim = torch.matmul(trg_flat, src_desc)            # COSINE SIMILARITY
+        similarity_map = torch.matmul(trg_flat, src_desc)       # COSINE SIMILARITY
+        best_idx = similarity_map.argmax()                     # NORMAL PEAK
 
-        best_idx = sim.argmax()
-        pred_xy = torch.tensor([best_idx % Wf, best_idx // Wf], device=CONFIGURATION["DEVICE"])           # PREDICTION
+        if CONFIGURATION["USE_WIN"]:
+            N = similarity_map.numel()
+            dim = int(N ** 0.5)
 
-        pred_x = (pred_xy[0] + 0.5) * (tw / Wf)
-        pred_y = (pred_xy[1] + 0.5) * (th / Hf)
-        pred_kps.append(torch.stack([pred_x, pred_y]))
+            similarity_map = similarity_map.view(dim, dim)
+            y_peak = best_idx // dim
+            x_peak = best_idx % dim                                  # COORDS
 
+            half = CONFIGURATION["WINDOW_SOFTMAX"] // 2
+            y0 = max(y_peak - half, 0)
+            y1 = min(y_peak + half + 1, dim)                  # WINDOW
+            x0 = max(x_peak - half, 0)
+            x1 = min(x_peak + half + 1, dim)
+            window = similarity_map[y0:y1, x0:x1]
+
+            (ys, xs) = torch.meshgrid(
+                torch.arange(y0, y1, device=similarity_map.device),
+                torch.arange(x0, x1, device=similarity_map.device),
+                indexing="ij")
+
+            coords = torch.stack([xs.flatten(), ys.flatten()], dim=1).float()
+            prob = F.softmax(window.flatten() / CONFIGURATION["TAU_SOFTMAX"], dim=0)              # SOFTMAX
+
+            pred_patch = (coords * prob[:, None]).sum(dim=0)
+            pred_x = (pred_patch[0] + 0.5) * (tw / dim)
+            pred_y = (pred_patch[1] + 0.5) * (th / dim)
+
+        else:
+            pred_xy = torch.tensor([best_idx % Wf, best_idx // Wf], device=CONFIGURATION["DEVICE"])
+
+            pred_x = (pred_xy[0] + 0.5) * (tw / Wf)
+            pred_y = (pred_xy[1] + 0.5) * (th / Hf)
+
+        pred_kps.append(torch.stack([pred_x, pred_y]))             # APPEND NEW POSSINILITY
     return torch.stack(pred_kps)
