@@ -23,28 +23,28 @@ CONFIGURATION = {
   "PATH_VAL_SPAIR71K": "/content/SPair-71k/PairAnnotation/val",
   "PATH_TRAIN_SPAIR71K": "/content/SPair-71k/PairAnnotation/trn",
 
-  "ALL_TEST_PATH_SPAIR71K": "/content/SPair-71k/Layout/small/test.txt",
-  "ALL_TRAIN_PATH_SPAIR71K": "/content/SPair-71k/Layout/small/trn.txt",
-  "ALL_VAL_PATH_SPAIR71K": "/content/SPair-71k/Layout/small/val.txt",
+  "ALL_TEST_PATH_SPAIR71K": "/content/SPair-71k/Layout/large/test.txt",
+  "ALL_TRAIN_PATH_SPAIR71K": "/content/SPair-71k/Layout/large/trn.txt",
+  "ALL_VAL_PATH_SPAIR71K": "/content/SPair-71k/Layout/large/val.txt",
 
   "IMAGE_FOLDER_NAME_SPAIR71K": "/content/SPair-71k/JPEGImages",
 
   # FOR INFERENCE
 
 	"ALPHA": [0.05, 0.1, 0.2],
-  "USE_WIN": True,
+  "USE_WIN": False,
   "WINDOW_SOFTMAX": 7,
   "TAU_SOFTMAX": 0.07,
 
   # FOR TUNING
 
   "TAU": 0.05,
-  "LEARNING_RATE": 1e-4,
-  "WEIGHT_DECAY": 1e-2,
+  "LEARNING_RATE": 5e-5,
+  "WEIGHT_DECAY": 5e-2,
   "NUM_EPOCHS": 1,
   "NUM_LAYERS": 1,
-  "BATCH_SIZE": 16,
-  "TUNING": False
+  "BATCH_SIZE": 32,
+  "TUNING": True
 }
 
 MODEL = None

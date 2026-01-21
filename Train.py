@@ -78,7 +78,8 @@ def get_split_loss(batch, grad=True, index=0):
         gy = torch.clamp(torch.tensor(gy, device=CONFIGURATION["DEVICE"]), 0, Hf - 1)
 
         gt_index = gy * Wf + gx
-        class_loss = class_loss + F.cross_entropy((sim / CONFIGURATION["TAU"]).unsqueeze(0), gt_index.unsqueeze(0))
+        class_loss = class_loss + F.cross_entropy((sim / CONFIGURATION["TAU"]).unsqueeze(0),
+                                                  gt_index.unsqueeze(0), label_smoothing=0.1)
 
     return class_loss
 
