@@ -2,7 +2,7 @@
 
 from torch.utils.data import Dataset, DataLoader
 from Configurations import CONFIGURATION
-import os, json, numpy as np
+import os, json, numpy as np, scipy.io as sio
 
 # --- DATASET CLASSES ---
 # --- COLLECT ALL JSON FILE ---
@@ -42,6 +42,44 @@ class SPair71kDataset(Dataset):
             "trg_bndbox": np.array(annotation["trg_bndbox"]),        # DICT of BATCHES (SIZE=1)
         }
 
+class PFPascalDataset(Dataset):
+
+    def __init__(self):
+        self.pair_files = []
+        dir = os.listdir(CONFIGURATION["PATH_ANNOTATIONS_PASCAL"])
+
+        for sottodir in dir:
+            if sottodir.startswith("."): continue         # SHALLOWED DIRECTORIES
+
+            for file in os.listdir(os.path.join(CONFIGURATION["PATH_ANNOTATIONS_PASCAL"], sottodir)):
+                self.pair_files.append((sottodir,file.split(".jpg")[0]))                # TAKE ALL FILES
+        return
+
+    def __len__(self):
+         return len(self.pair_files)
+
+    def __getitem__(self, idx):
+       (src_name, trg_name) = self.pair_files[idx][1].split("-")              # (CATEGORY,ID)
+
+       src_ann = os.path.join(CONFIGURATION["ALL_ANNOTATIONS_PASCAL"], self.pair_files[idx][0], src_name + ".mat")
+       trg_ann = os.path.join(CONFIGURATION["ALL_ANNOTATIONS_PASCAL"], self.pair_files[idx][0], trg_name + ".mat")     # ANNOTATIONS
+
+       ann = sio.loadmat(src_ann)
+       ann2 = sio.loadmat(trg_ann)               # ANNOTATIONS
+
+       src_kps = np.array(ann["kps"])
+       trg_kps = np.array(ann2["kps"])
+       valid_mask = ~np.isnan(src_kps).any(axis=1) & (~np.isnan(trg_kps).any(axis=1))    # VALID KEYPOINTS
+
+       return {
+          "src_path": os.path.join(CONFIGURATION["ALL_IMAGES_PASCAL"], src_name + ".jpg"),
+          "trg_path": os.path.join(CONFIGURATION["ALL_IMAGES_PASCAL"], trg_name + ".jpg"),
+          "src_kps": src_kps[valid_mask],                   # GET DATA
+          "trg_kps": trg_kps[valid_mask],
+          "trg_bndbox": np.array(ann2["bbox"]).squeeze(),
+          "kps_ids": np.arange(len(ann["kps"][valid_mask]), dtype=np.int32),
+          }
+
 def custom_collate_fn(batch):
     collated_batch = {}
     keys = batch[0].keys()
@@ -63,5 +101,9 @@ def Loader(index):            # TEST, TRAINING OR EVALUATION
     elif index == 2:
         dataset = SPair71kDataset(CONFIGURATION["ALL_VAL_PATH_SPAIR71K"], CONFIGURATION["PATH_VAL_SPAIR71K"])
         loader = DataLoader(dataset, 1)
+
+    elif index == 3:
+        dataset = PFPascalDataset()
+        loader = DataLoader(dataset, 1)                   # INFERENCE WITH PASCAL
 
     return loader

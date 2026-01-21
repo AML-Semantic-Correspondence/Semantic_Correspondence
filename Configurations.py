@@ -8,6 +8,7 @@ import torch
 CONFIGURATION = {
 	"PATH_DRIVE": "/content/drive",
 	"PATH_FILE": "/content/drive/MyDrive/AML-Semantic-Correspondence/datasets/SPair-71k.tar.gz",
+  "PATH_PASCAL": "/content/drive/MyDrive/AML-Semantic-Correspondence/datasets/PF-dataset-PASCAL.zip",
   "PATH_BEST_MODEL": "/content/drive/MyDrive/AML-Semantic-Correspondence/weights/best_model.pth",
 
 	"PTH_PATH_DINOV2": "/content/drive/MyDrive/AML-Semantic-Correspondence/weights/dinov2_vitb14_reg4_pretrain.pth",
@@ -29,6 +30,12 @@ CONFIGURATION = {
 
   "IMAGE_FOLDER_NAME_SPAIR71K": "/content/SPair-71k/JPEGImages",
 
+  # DATASET PASCAL
+
+  "PATH_ANNOTATIONS_PASCAL": "/content/PF-dataset-PASCAL/ShowMatchingPairs",
+  "ALL_ANNOTATIONS_PASCAL": "/content/PF-dataset-PASCAL/Annotations",
+  "ALL_IMAGES_PASCAL": "/content/PF-dataset-PASCAL/JPEGImages",
+
   # FOR INFERENCE
 
 	"ALPHA": [0.05, 0.1, 0.2],
@@ -39,8 +46,8 @@ CONFIGURATION = {
   # FOR TUNING
 
   "TAU": 0.05,
-  "LEARNING_RATE": 5e-5,
-  "WEIGHT_DECAY": 5e-2,
+  "LEARNING_RATE": 1e-5,
+  "WEIGHT_DECAY": 1e-1,
   "NUM_EPOCHS": 1,
   "NUM_LAYERS": 1,
   "BATCH_SIZE": 32,

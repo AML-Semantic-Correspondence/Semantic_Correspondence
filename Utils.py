@@ -59,18 +59,15 @@ def get_predictions(batch, index=0):
         best_idx = similarity_map.argmax()                     # NORMAL PEAK
 
         if CONFIGURATION["USE_WIN"]:
-            N = similarity_map.numel()
-            dim = int(N ** 0.5)
-
-            similarity_map = similarity_map.view(dim, dim)
-            y_peak = best_idx // dim
-            x_peak = best_idx % dim                                  # COORDS
+            similarity_map = similarity_map.view(Hf, Wf)
+            y_peak = best_idx // Wf
+            x_peak = best_idx % Wf                                  # COORDS
 
             half = CONFIGURATION["WINDOW_SOFTMAX"] // 2
             y0 = max(y_peak - half, 0)
-            y1 = min(y_peak + half + 1, dim)                  # WINDOW
+            y1 = min(y_peak + half + 1, Hf)                  # WINDOW
             x0 = max(x_peak - half, 0)
-            x1 = min(x_peak + half + 1, dim)
+            x1 = min(x_peak + half + 1, Wf)
             window = similarity_map[y0:y1, x0:x1]
 
             (ys, xs) = torch.meshgrid(
@@ -81,15 +78,13 @@ def get_predictions(batch, index=0):
             coords = torch.stack([xs.flatten(), ys.flatten()], dim=1).float()
             prob = F.softmax(window.flatten() / CONFIGURATION["TAU_SOFTMAX"], dim=0)              # SOFTMAX
 
-            pred_patch = (coords * prob[:, None]).sum(dim=0)
-            pred_x = (pred_patch[0] + 0.5) * (tw / dim)
-            pred_y = (pred_patch[1] + 0.5) * (th / dim)
+            pred_xy = (coords * prob[:, None]).sum(dim=0)
 
         else:
             pred_xy = torch.tensor([best_idx % Wf, best_idx // Wf], device=CONFIGURATION["DEVICE"])
 
-            pred_x = (pred_xy[0] + 0.5) * (tw / Wf)
-            pred_y = (pred_xy[1] + 0.5) * (th / Hf)
-
+        pred_x = (pred_xy[0] + 0.5) * (tw / Wf)
+        pred_y = (pred_xy[1] + 0.5) * (th / Hf)
         pred_kps.append(torch.stack([pred_x, pred_y]))             # APPEND NEW POSSINILITY
+
     return torch.stack(pred_kps)

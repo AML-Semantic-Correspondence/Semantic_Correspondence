@@ -18,6 +18,7 @@ if CONFIGURATION["MODEL_VERSION"] == "sam":
 
 drive.mount(CONFIGURATION["PATH_DRIVE"], force_remount=True)
 # !tar -xzf {CONFIGURATION["PATH_FILE"]}
+# !unzip -o -q {CONFIGURATION["PATH_PASCAL"]}
 
 # --- LOAD MODEL ---
 
