@@ -1,4 +1,4 @@
-#@title Train
+# @title Train
 
 from Configurations import CONFIGURATION, Loader, MODEL
 from Utils import get_descriptors
@@ -79,7 +79,7 @@ def get_split_loss(batch, grad=True, index=0):
 
         gt_index = gy * Wf + gx
         class_loss = class_loss + F.cross_entropy((sim / CONFIGURATION["TAU"]).unsqueeze(0),
-                                                  gt_index.unsqueeze(0), label_smoothing=0.1)
+                                                  gt_index.unsqueeze(0), label_smoothing=0.1)       # COMPUTE LOSS
 
     return class_loss
 
@@ -95,7 +95,7 @@ def Train_step():
 
     print()
     print("="*60)
-    print("PERFORMING INITIAL EVALUATION ON PRE-TRAINED MODEL")
+    print("PERFORMING INITIAL EVALUATION ON PRE-TRAINED MODEL")                # INITIAL LOSS AND VALIDATION PCKS
     print("="*60)
 
     initial_val_loss = get_total_loss(loader_val)
@@ -106,7 +106,7 @@ def Train_step():
     print()
 
     print()
-    print("Fine-tuning on " + str(CONFIGURATION["NUM_LAYERS"]) + " free layers")
+    print("Fine-tuning on " + str(CONFIGURATION["NUM_LAYERS"]) + " free layers")        # UNFREEZE
     setup_light_finetuning()
     params = [p for p in MODEL.parameters() if p.requires_grad]
     optimizer = torch.optim.AdamW(params, lr=CONFIGURATION["LEARNING_RATE"], weight_decay=CONFIGURATION["WEIGHT_DECAY"])
@@ -140,13 +140,13 @@ def Train_step():
 
         print("="*60)
         print("Epoch train loss: " + str(epoch_train_loss))
-        print("Epoch validation loss: " + str(val_loss))                  # NUMBERS
+        print("Epoch validation loss: " + str(val_loss))                  # VALIDATION LOSS AND PCKS
         print()
         run_evaluation(loader_val, "validation")
 
         if val_loss < global_loss:
             global_loss = val_loss
-            torch.save(MODEL.state_dict(), CONFIGURATION["PATH_BEST_MODEL"])
+            torch.save(MODEL.state_dict(), CONFIGURATION["PATH_BEST_MODEL"])           # SAVE MODEL
             print("BEST MODEL SAVED!")
 
         print("="*60)

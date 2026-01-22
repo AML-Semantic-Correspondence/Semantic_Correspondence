@@ -38,10 +38,10 @@ CONFIGURATION = {
 
   # FOR INFERENCE
 
-	"ALPHA": [0.05, 0.1, 0.2],
+  "ALPHA": [0.05, 0.1, 0.2],
   "USE_WIN": False,
-  "WINDOW_SOFTMAX": 7,
-  "TAU_SOFTMAX": 0.07,
+  "WINDOW_SOFTMAX": 5,
+  "TAU_SOFTMAX": 0.05,
 
   # FOR TUNING
 
@@ -51,7 +51,7 @@ CONFIGURATION = {
   "NUM_EPOCHS": 1,
   "NUM_LAYERS": 1,
   "BATCH_SIZE": 32,
-  "TUNING": True
+  "TUNING": False
 }
 
 MODEL = None
