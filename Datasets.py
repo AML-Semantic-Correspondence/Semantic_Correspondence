@@ -80,6 +80,56 @@ class PFPascalDataset(Dataset):
           "kps_ids": np.arange(len(ann["kps"][valid_mask]), dtype=np.int32),
           }
 
+class PFWillowDataset(Dataset):
+
+    def __init__(self):
+        self.pair_files = []
+        file = open(CONFIGURATION["PATH_ANNOTATIONS_WILLOW"], "r")
+        self.pair_files = file.readlines()[1:]                              # TAKE ALL FILES
+        file.close()
+        return
+
+    def __len__(self):
+        return len(self.pair_files)
+
+    # --- LINE: PATHSRC,PATHTRG,XsSRC (10),YsSRC (10),XsTRG (10),YsTRG (10) ---
+
+    def __getitem__(self, idx):
+       ann = self.pair_files[idx].strip().split(",")
+       src_kps = []
+       trg_kps = []
+
+       # SRC_KPS
+
+       for i in range(2, len(ann)-3*CONFIGURATION["LEN"]):
+           src_kps.append((ann[i], ann[i+CONFIGURATION["LEN"]]))
+
+       # TRG_KPS
+
+       for i in range(2+2*CONFIGURATION["LEN"], len(ann)-CONFIGURATION["LEN"]):    # TRG_KPS
+           trg_kps.append((ann[i], ann[i+CONFIGURATION["LEN"]]))
+
+       src_kps = np.array(src_kps, dtype=np.float32)
+       trg_kps = np.array(trg_kps, dtype=np.float32)
+
+       # BBOX
+
+       x_min = np.min(trg_kps[:,0])
+       y_min = np.min(trg_kps[:,1])           # ESTREME VALUES
+       x_max = np.max(trg_kps[:,0])
+       y_max = np.max(trg_kps[:,1])
+
+       trg_bndbox = np.array([x_min, y_min, x_max, y_max], dtype=np.float32)
+
+       return {
+          "src_path": ann[0],
+          "trg_path": ann[1],
+          "src_kps": src_kps,                   # GET DATA
+          "trg_kps": trg_kps,
+          "trg_bndbox": trg_bndbox,
+          "kps_ids": np.arange(CONFIGURATION["LEN"], dtype=np.int32),
+          }
+
 def custom_collate_fn(batch):
     collated_batch = {}
     keys = batch[0].keys()
@@ -105,5 +155,9 @@ def Loader(index):            # TEST, TRAINING OR EVALUATION
     elif index == 3:
         dataset = PFPascalDataset()
         loader = DataLoader(dataset, 1)                   # INFERENCE WITH PASCAL
+
+    elif index == 4:
+        dataset = PFWillowDataset()
+        loader = DataLoader(dataset, 1)                   # INFERENCE WITH WILLOW
 
     return loader
