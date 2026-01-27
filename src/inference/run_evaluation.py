@@ -20,7 +20,7 @@ def run_evaluation(backbone, dataset_var, split, prediction_method, weights_path
         None (prints results)
     """
     # Load model dynamically based on backbone
-    backbone_utils = importlib.import_module(f"..utils.{backbone}_utils")
+    backbone_utils = importlib.import_module(f"src.utils.{backbone}_utils")
     CONFIGURATION_MODEL = backbone_utils.CONFIGURATION_MODEL
     
     # Load model using dynamic imports based on backbone type

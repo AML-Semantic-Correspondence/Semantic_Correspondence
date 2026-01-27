@@ -1,8 +1,8 @@
 from PIL import Image
 import torch, torch.nn.functional as F, math
 
-from ..dataset.spair71k import CONFIGURATION_DS
-from ..utils.common_utils import PREPROCESS
+from src.dataset.spair71k import CONFIGURATION_DS
+from src.utils.common_utils import PREPROCESS
 
 CONFIGURATION_MODEL = {  
     "DEVICE": "cuda" if torch.cuda.is_available() else "cpu",

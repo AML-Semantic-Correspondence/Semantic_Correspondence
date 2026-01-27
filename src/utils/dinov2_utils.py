@@ -1,8 +1,8 @@
 from PIL import Image
 import torch, torch.nn.functional as F, math
 
-from ..dataset.spair71k import CONFIGURATION_DS
-from ..utils.common_utils import PREPROCESS
+from src.dataset.spair71k import CONFIGURATION_DS
+from src.utils.common_utils import PREPROCESS
 
 CONFIGURATION_MODEL = {  
     "PTH_PATH_DINOV2": "/content/drive/MyDrive/AML-Semantic-Correspondence/weights/dinov2_vitb14_reg4_pretrain.pth",

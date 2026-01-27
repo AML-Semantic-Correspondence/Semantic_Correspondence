@@ -25,7 +25,7 @@ def get_predictions_from_batch(batch, backbone, prediction_method, model):
     Returns:
         torch.Tensor: Stack of predicted keypoints
     """
-    get_descriptors = importlib.import_module(f"..utils.{backbone}_utils").get_descriptors
+    get_descriptors = importlib.import_module(f"src.utils.{backbone}_utils").get_descriptors
     
     src_kps = batch["src_kps"][0]
     

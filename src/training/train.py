@@ -8,9 +8,9 @@ import importlib
 from torch.utils.data import DataLoader
 from tqdm.auto import tqdm
 
-from ..inference.common_inference import CONFIGURATION_INF
-from ..inference.run_evaluation import run_evaluation
-from ..inference.argmax import argmax_strategy
+from src.inference.common_inference import CONFIGURATION_INF
+from src.inference.run_evaluation import run_evaluation
+from src.inference.argmax import argmax_strategy
 
 CONFIGURATION_TRAIN = {
     "TAU": 0.05,
@@ -86,7 +86,7 @@ def get_split_loss(batch, backbone, model, grad=True, index=0):
     Returns:
         torch.Tensor: Computed loss
     """
-    get_descriptors = importlib.import_module(f"..utils.{backbone}_utils").get_descriptors
+    get_descriptors = importlib.import_module(f"src.utils.{backbone}_utils").get_descriptors
     
     src_kps = torch.as_tensor(batch["src_kps"][index]).to(device=CONFIGURATION_INF["DEVICE"], dtype=torch.float32)
     trg_kps = torch.as_tensor(batch["trg_kps"][index]).to(device=CONFIGURATION_INF["DEVICE"], dtype=torch.float32)
@@ -164,7 +164,7 @@ def train_step(backbone):
     global_loss = float("inf")
     
     # Load model dynamically based on backbone
-    backbone_utils = importlib.import_module(f"..utils.{backbone}_utils")
+    backbone_utils = importlib.import_module(f"src.utils.{backbone}_utils")
     CONFIGURATION_MODEL = backbone_utils.CONFIGURATION_MODEL
     
     # Load model using dynamic imports based on backbone type
