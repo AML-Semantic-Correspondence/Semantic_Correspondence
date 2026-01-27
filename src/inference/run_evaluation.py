@@ -3,7 +3,7 @@ import torch
 import importlib
 from torch.utils.data import DataLoader
 
-from .common_inference import get_predictions_from_batch, CONFIGURATION_INF
+from src.inference.common_inference import get_predictions_from_batch, CONFIGURATION_INF
 
 
 def run_evaluation(backbone, dataset_var, split, prediction_method, weights_path=None):
@@ -35,7 +35,7 @@ def run_evaluation(backbone, dataset_var, split, prediction_method, weights_path
     model.eval()
     
     # Create dataset and loader on-the-fly
-    dataset_module = importlib.import_module(f"..dataset.{dataset_var}")
+    dataset_module = importlib.import_module(f"src.dataset.{dataset_var}")
     CONFIGURATION_DS = dataset_module.CONFIGURATION_DS
     split = split.upper()
     

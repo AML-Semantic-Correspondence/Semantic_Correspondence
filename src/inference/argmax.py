@@ -4,7 +4,7 @@
 # split: train, val, test
 
 import torch
-from .common_inference import  CONFIGURATION_INF
+from src.inference.common_inference import  CONFIGURATION_INF
 
 def argmax_strategy(similarity_map, best_idx, Hf, Wf):
     """

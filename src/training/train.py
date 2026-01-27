@@ -178,7 +178,7 @@ def train_step(backbone):
     model = model.to(CONFIGURATION_MODEL["DEVICE"])
     
     # Create training and validation datasets on-the-fly
-    dataset_module = importlib.import_module(f"..dataset.spair71k")
+    dataset_module = importlib.import_module(f"src.dataset.spair71k")
     CONFIGURATION_DS = dataset_module.CONFIGURATION_DS
     
     # Training dataset

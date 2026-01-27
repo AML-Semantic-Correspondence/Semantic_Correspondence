@@ -5,7 +5,7 @@
 
 import torch
 import torch.nn.functional as F
-from .common_inference import CONFIGURATION_INF
+from src.inference.common_inference import CONFIGURATION_INF
 
 CONFIGURATION_WSA = {
     "WINDOW_SOFTMAX": 5,
