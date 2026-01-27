@@ -18,7 +18,7 @@ CONFIGURATION_TRAIN = {
     "WEIGHT_DECAY": 1e-1, 
     "NUM_EPOCHS": 1,
     "NUM_LAYERS": 1,
-    "BATCH_SIZE": 32,
+    "BATCH_SIZE": 32,   # 8 for SAM due to memory constraints
     "PATH_BEST_MODEL": "/content/drive/MyDrive/AML-Semantic-Correspondence/weights/best_model.pth",
 }
 
