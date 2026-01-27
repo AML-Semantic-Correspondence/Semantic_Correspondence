@@ -5,6 +5,7 @@ from src.dataset.spair71k import CONFIGURATION_DS
 from src.utils.common_utils import PREPROCESS
 
 CONFIGURATION_MODEL = {  
+    "DEVICE": "cuda" if torch.cuda.is_available() else "cpu",
     "PTH_PATH_DINOV2": "/content/drive/MyDrive/AML-Semantic-Correspondence/weights/dinov2_vitb14_reg4_pretrain.pth",
     "IMAGE_SIZE": 518,
 }
