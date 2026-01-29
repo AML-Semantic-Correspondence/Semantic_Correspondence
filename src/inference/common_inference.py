@@ -12,19 +12,7 @@ CONFIGURATION_INF = {
 }
 
 def get_predictions_from_batch(batch, backbone, prediction_method, model):
-    """
-    Process predictions for a single batch (used by evaluation functions).
-    
-    Args:
-        batch: Batch data from DataLoader
-        backbone: Model backbone ('dinov2', 'dinov3', 'sam')
-        prediction_method: Function that takes (similarity_map, best_idx, Hf, Wf) 
-                          and returns pred_xy coordinates
-        model: The model to use for feature extraction
-    
-    Returns:
-        torch.Tensor: Stack of predicted keypoints
-    """
+   
     get_descriptors = importlib.import_module(f"src.utils.{backbone}_utils").get_descriptors
     
     src_kps = batch["src_kps"][0]

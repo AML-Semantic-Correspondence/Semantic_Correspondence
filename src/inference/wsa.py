@@ -13,17 +13,7 @@ CONFIGURATION_WSA = {
 }
 
 def wsa_strategy(similarity_map, best_idx, Hf, Wf):
-    """
-    Window Soft Argmax prediction strategy.
     
-    Args:
-        similarity_map: Computed similarity map
-        best_idx: Index of maximum similarity
-        Hf, Wf: Height and width of feature map
-        
-    Returns:
-        torch.Tensor: Predicted coordinates [x, y]
-    """
     similarity_map = similarity_map.view(Hf, Wf)
     y_peak = best_idx // Wf
     x_peak = best_idx % Wf

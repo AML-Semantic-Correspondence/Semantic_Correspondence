@@ -7,18 +7,7 @@ from src.inference.common_inference import get_predictions_from_batch, CONFIGURA
 
 
 def run_evaluation(backbone, dataset_var, split, prediction_method, weights_path=None):
-    """
-    Run evaluation on a dataset using specified prediction method.
     
-    Args:
-        backbone: Model backbone ('dinov2', 'dinov3', 'sam')
-        dataset_var: Dataset to use ('spair71k', 'pf-pascal', 'pf-willow', 'ap-10k')
-        split: Data split to use ('train', 'val', 'test') - note: ap-10k only has 'test'
-        prediction_method: Function that takes (similarity_map, best_idx, Hf, Wf)
-    
-    Returns:
-        None (prints results)
-    """
     # Load model dynamically based on backbone
     backbone_utils = importlib.import_module(f"src.utils.{backbone}_utils")
     CONFIGURATION_MODEL = backbone_utils.CONFIGURATION_MODEL

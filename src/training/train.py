@@ -152,15 +152,7 @@ def get_total_loss(loader, backbone, model):
     return total_loss / len(loader)
 
 def train_step(backbone):
-    """
-    Main training function that handles the complete training loop.
     
-    Args:
-        backbone: Model backbone type ('dinov2', 'dinov3', 'sam')
-        
-    Returns:
-        None (saves best model to disk)
-    """
     global_loss = float("inf")
     
     # Load model dynamically based on backbone
