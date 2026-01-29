@@ -12,8 +12,8 @@ def run_evaluation(backbone, dataset_var, split, prediction_method, weights_path
     
     Args:
         backbone: Model backbone ('dinov2', 'dinov3', 'sam')
-        dataset_var: Dataset to use ('spair71k', 'pf-pascal', 'pf-willow')
-        split: Data split to use ('train', 'val', 'test')
+        dataset_var: Dataset to use ('spair71k', 'pf-pascal', 'pf-willow', 'ap-10k')
+        split: Data split to use ('train', 'val', 'test') - note: ap-10k only has 'test'
         prediction_method: Function that takes (similarity_map, best_idx, Hf, Wf)
     
     Returns:
@@ -45,6 +45,9 @@ def run_evaluation(backbone, dataset_var, split, prediction_method, weights_path
                 CONFIGURATION_DS[f"ALL_{split}_PATH"], 
                 CONFIGURATION_DS[f"PATH_{split}"]
             )
+        case "ap-10k":
+            # AP-10K only has test data available
+            dataset = dataset_module.Dataset_ap10k()
         case _:
             class_name = f"Dataset_{dataset_var.replace('-', '_')}"
             dataset = getattr(dataset_module, class_name)()
@@ -57,6 +60,15 @@ def run_evaluation(backbone, dataset_var, split, prediction_method, weights_path
     total_keypoints = 0
 
     for batch in tqdm(loader, desc=f"Evaluating {dataset_var} {split} PCK metrics"):
+        # Skip logic for datasets with variable keypoint pairs (like AP-10K)
+        if dataset_var == "ap-10k":
+            num_kps_in_image = len(batch["kps_ids"][0])  # AP-10K: kps_ids contains only common keypoints
+        else:
+            num_kps_in_image = len(batch["trg_kps"][0])  # Other datasets: all target keypoints
+            
+        if num_kps_in_image == 0:
+            continue  # Skip this pair as there is no ground truth to compare against
+            
         trg_kps = torch.as_tensor(batch["trg_kps"][0]).to(device=CONFIGURATION_INF["DEVICE"], dtype=torch.float32)
         trg_bndbox = torch.as_tensor(batch["trg_bndbox"][0]).to(device=CONFIGURATION_INF["DEVICE"], dtype=torch.float32)
 
@@ -64,7 +76,6 @@ def run_evaluation(backbone, dataset_var, split, prediction_method, weights_path
         max_dim = max(trg_bndbox[2]-trg_bndbox[0], trg_bndbox[3]-trg_bndbox[1])         # NORMALIZATION FACTOR
 
         image_correct_counts = {alpha: 0 for alpha in CONFIGURATION_INF["ALPHA"]}           # FOR CURRENT IMAGE
-        num_kps_in_image = len(batch["kps_ids"][0])
         total_images += 1
         total_keypoints += num_kps_in_image
 
@@ -79,6 +90,12 @@ def run_evaluation(backbone, dataset_var, split, prediction_method, weights_path
         for alpha in CONFIGURATION_INF["ALPHA"]:
             img_accuracy = (100.0 * image_correct_counts[alpha] / num_kps_in_image)          # PCK FOR THIS IMAGE
             total_correct[alpha] += img_accuracy
+    
+    # Check if we processed any images to avoid division by zero
+    if total_images == 0:
+        print(f"\nNo valid pairs with common keypoints found in {dataset_var} {split} split.")
+        return
+        
     print()
     print("PCK@t results per image (Average of individual image accuracies):")
     for alpha in CONFIGURATION_INF["ALPHA"]:
