@@ -2,9 +2,9 @@
 
 ## Autors
 
-Alberto Ciccomascolo - s333968,  
-Alessandro Mosca - s333956,  
-Gabriele Viceconte - s349460 e  
+Alberto Ciccomascolo - s333968  
+Alessandro Mosca - s333956  
+Gabriele Viceconte - s349460  
 Matteo Zito - s304809  
 
 ## Introduction
@@ -26,5 +26,5 @@ The other directory named **src** contains the python functions imported and cal
 
 ## Results
 
-Our analisy results are reported into the paper **Semantic Correspondence with Visual Foundation Models**.
+Our analysis results are reported into the paper **Semantic Correspondence with Visual Foundation Models**.
 This repository contains a pdf version of this paper.
